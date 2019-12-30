@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>飞机大战</title>
+    <style>
+        .container{width:360px;margin:20px auto;position:relative;overflow: hidden;}
+        #myPlane{position: absolute;}
+        .enemy{ position: absolute;z-index: 2;}
+
+    </style>
+    <script src="img/engine.js"></script>
+    <script>
+        function keydownEvent(e)
+        {
+            var ev = e || event;
+            var keyCode=ev.keyCode;
+            //W键上飞
+            if(keyCode==Contances.W_KEYCODE){
+
+                goingUp=true;///////////////////////////////////////
+            }
+            //S键下飞
+            else if(keyCode==Contances.S_KEYCODE){
+                goingDown=true;
+            }
+            //A键左飞
+            else if(keyCode==Contances.A_KEYCODE){
+                goingLeft=true;
+            }
+            //D键右飞
+            else if(keyCode==Contances.D_KEYCODE){
+                goingRight=true;
+            }
+
+        }
+        //设置游戏的帧动画定时器42ms
+        var gameInterval=setInterval(function () {
+            if(goingUp){
+                var y=getY($(planeId));
+                y+=Contances.STEP;
+                //边界碰撞检测540
+                if(y>Contances.BG_HEIGHT-Contances.PLANE_HEIGHT){
+                    return ;
+                }
+                setY($(planeId),y);
+            }
+            if(goingDown){
+                var y=getY($(planeId));
+                y-=Contances.STEP;
+                //边界碰撞检测10
+                if(y<Contances.PLANE_HEIGHT-Contances.PLANE_HEIGHT){
+                    return ;
+                }
+                setY($(planeId),y);
+            }
+            if(goingLeft){
+                var x=getX($(planeId));
+                x-=Contances.STEP;
+                //边界碰撞检测-2
+                if(x<Contances.PLANE_WIDTH-Contances.PLANE_WIDTH){
+                    return ;
+                }
+                setX($(planeId),x);
+            }
+            if(goingRight){
+                var x=getX($(planeId))+Contances.STEP;
+                if(x>Contances.BG_WIDTH-Contances.PLANE_WIDTH){
+                    return ;
+                }
+                setX($(planeId),x);
+            }
+            //扫描全局的所有的子弹，让子弹快乐的飞吧
+            var bullets= document.getElementsByClassName('bullet');
+            if(bullets){
+                for(var i=0;i<bullets.length;i++){
+                    var y=getY(bullets[i])+Contances.BULLET_STEP;
+
+                    /////
+                    //扫描所有子弹是否和敌机发生碰撞
+                    //遍历所有敌机
+                    var enemies=document.getElementsByClassName("enemy");
+                    for(var j=0;j<enemies.length;j++){
+                        var x1=getX(enemies[j]);
+                        var y1=getY(enemies[j]);
+                        var x2=getX(bullets[i]);
+                        var y2=y;
+
+                        //console.log(x1,x2);
+
+                        if(Math.abs(x1-x2)<Contances.ENEMY_WIDTH && Math.abs(y1-y2)<Contances.ENEMY_HEIGHT){
+                            //alert("发生碰撞");<img src="img/airplane1.png" height="90" width="70"/>
+                            enemies[j].src="img/airplane1.png";
+
+
+                            //定时清理爆炸图片（可用）
+                            /*(function(enemy){
+
+                                setTimeout(function () {
+
+                                    $('container').removeChild(enemy);
+
+                                },200);
+                            })(enemies[j]);*/
+                            /*clearInterval(bulletTimer);///////////////////////////////////
+                            clearInterval(gameInterval);*/
+
+                        }
+                    }
+
+                    ////
+
+                   if(y>Contances.BG_HEIGHT){
+                       $('container').removeChild(bullets[i]);
+                       //console.log("子弹已经越界，消除")
+                       continue;
+                   }
+                    setY(bullets[i],y);
+                }
+            }
+            time+=0.1;
+
+        },42);
+
+        // <img src="img/assisent1.png" height="30" width="13" style="position: absolute;left:18px;bottom: 50px; z-index: -1" />
+        //设置定时器，动态绘制子弹
+
+        //<img style="position: absolute;left:13px ;bottom:50px;z-index: -1" src="img/assisent1.png" height="30" width="13"/>
+
+        var bulletTimer=setInterval(function () {
+            var bulletX=getX($(planeId)) + 7;
+            var bulletY=getY($(planeId))+64;
+            console.log(bulletX,bulletY);
+
+            //height="30" width="13"
+            $('container').innerHTML+="<img class='bullet' style=\"position: absolute;left:"+bulletX+"px ;bottom:"+bulletY+"px;z-index: 2\" src=\"img/assisent1.png\" />";
+
+        },500);
+
+        function keyupEvent(e)
+        {
+            var ev = e || event;
+            var keyCode=ev.keyCode;
+            //W键上飞
+            if(keyCode==Contances.W_KEYCODE) {
+
+                goingUp = false;///////////////////////////////////////
+            }
+            //S键下飞
+            if(keyCode==Contances.S_KEYCODE) {
+
+                goingDown = false;///////////////////////////////////////
+            }
+            //D
+            if(keyCode==Contances.D_KEYCODE) {
+
+                goingRight = false;///////////////////////////////////////
+            }
+            //A键左飞
+            if(keyCode==Contances.A_KEYCODE) {
+
+                goingLeft = false;///////////////////////////////////////
+            }
+        }
+        //敌机的移动方法
+        setInterval(function () {
+            var enemies=document.getElementsByClassName('enemy');
+            for(var  i=0;i<enemies.length;i++){
+                var y=getY(enemies[i])-Contances.ENEMY_STEP;
+                setY(enemies[i],y);
+                if(y<0-Contances.ENEMY_HEIGHT){
+                    $('container').removeChild(enemies[i]);
+                    return;
+                }
+
+                var x=getX(enemies[i]);
+                x=x+5*Math.sin(time);
+                setX(enemies[i],x);
+
+                if(x<0-Contances.BG_WIDTH){
+                    $('container').removeChild(enemies[i]);
+                    return;
+                }
+            }
+        },50);
+        //定时清理爆炸图片
+        setInterval(function () {
+            var enemies=document.getElementsByClassName('enemy');
+            for(var i=0;i<enemies.length;i++)
+            {
+                if(enemies[i].src.indexOf("img/airplane1.png")!=-1){
+                    $('container').removeChild(enemies[i]);
+                }
+            }
+        },200)
+
+        //自动刷新敌机的方法
+        setInterval(function () {
+             var x=Math.floor(360*Math.random())-Contances.ENEMY_WIDTH;
+             $('container').innerHTML+="<img class=\"enemy\" style=\"left:"+x+"px;bottom: 600px;\" src=\"img/boss2.png\" height=\"50\" width=\"90\"/>";
+
+        },1000)
+
+    </script>
+</head>
+<body onkeydown="keydownEvent()" onkeyup="keyupEvent()">
+
+<div class="container" id="container">
+
+
+    <img class="enemy" style="left:150px;bottom: 600px;" src="img/boss2.png" height="50" width="90"/>
+    <img src="img/bg1.jpg" style="width:360px; z-index: 1"/>
+
+    <div id="myPlane" style="width:40px;bottom:10px;left:160px;z-index: 3">
+
+        <img  src="img/hero1 .png" style="width:100%;"/>
+    </div>
+
+    </div>
+</body>
+</html>

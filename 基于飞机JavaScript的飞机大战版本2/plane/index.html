@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>飞机大战</title>
+    <style>
+        .container{width:360px;margin:20px auto;position:relative;}
+        #myPlane{position: absolute;}
+    </style>
+    <script src="img/engine.js"></script>
+    <script>
+        function keydownEvent(e)
+        {
+            var ev = e || event;
+            var keyCode=ev.keyCode;
+            //W键上飞
+            if(keyCode==Contances.W_KEYCODE){
+
+                goingUp=true;///////////////////////////////////////
+
+                //1.获取原来的bottom（注意要转换成数字！！）
+                //var y=$('myPlane').style.bottom;
+                //y=y.replace('px','')-0;
+                var y=getY($(planeId));
+                //2.更改y坐标值，得到新的坐标
+
+                y+=Contances.STEP;
+
+                //边界碰撞检测540
+                if(y>Contances.BG_HEIGHT-Contances.PLANE_HEIGHT){
+                    return ;
+                }
+                //3.把新的坐标从新赋值给plane
+                setY($(planeId),y);
+                //$('myPlane').style.bottom=y+"px";
+                //console.log(y+1);
+            }
+            //S键下飞
+            else if(keyCode==Contances.S_KEYCODE){
+                //1.获取原来的bottom（注意要转换成数字！！）
+                //var y=$('myPlane').style.bottom;
+                //y=y.replace('px','')-0;
+                var y=getY($(planeId));
+                //2.更改y坐标值，得到新的坐标
+                y-=Contances.STEP;
+
+                //边界碰撞检测10
+                if(y<Contances.PLANE_HEIGHT-Contances.PLANE_HEIGHT){
+                    return ;
+                }
+                //3.把新的坐标从新赋值给plane
+
+                setY($(planeId),y);
+                //$('myPlane').style.bottom=y+"px";
+                //console.log(y+1);
+            }
+            //A键左飞
+            else if(keyCode==Contances.A_KEYCODE){
+                //1.获取原来的bottom（注意要转换成数字！！）
+                //var x=$('myPlane').style.left;
+                //x=x.replace('px','')-0;
+
+                var x=getX($(planeId));
+                //2.更改y坐标值，得到新的坐标
+                x-=Contances.STEP;
+                //边界碰撞检测-2
+                if(x<Contances.PLANE_WIDTH-Contances.PLANE_WIDTH){
+                    return ;
+                }
+                //3.把新的坐标从新赋值给plane
+
+                setX($(planeId),x);
+                //$('myPlane').style.left=x+"px";
+                //console.log(x+1);
+            }
+            //D键右飞
+            else if(keyCode==Contances.D_KEYCODE){
+                //1.获取原来的bottom（注意要转换成数字！！）
+                //var x=$('myPlane').style.left;
+                //x=x.replace('px','')-0;
+
+                var x=getX($(planeId));
+                //2.更改y坐标值，得到新的坐标
+                x+=Contances.STEP;
+                //边界碰撞检测
+                if(x>Contances.BG_WIDTH-Contances.PLANE_WIDTH){
+                    return ;
+                }
+                //3.把新的坐标从新赋值给plane
+
+                setX($(planeId),x);
+                //$('myPlane').style.left=x+"px";
+                //console.log(x+1);
+            }
+
+            //设置游戏的帧动画定时器42ms
+            var gameInterval=setInterval(function () {
+                if(goingUp){
+                    var y=getY($(planeId));
+                    y+=Contances.STEP;
+                    //边界碰撞检测540
+                    if(y>Contances.BG_HEIGHT-Contances.PLANE_HEIGHT){
+                        return ;
+                    }
+                    setY($(planeId),y);
+                }
+            },42);
+
+
+        }
+        function keyupEvent(e)
+        {
+            var ev = e || event;
+            var keyCode=ev.keyCode;
+            //W键上飞
+            if(keyCode==Contances.W_KEYCODE) {
+
+                goingUp = false;///////////////////////////////////////
+            }
+        }
+
+    </script>
+</head>
+<body onkeydown="keydownEvent()" onkeyup="keyupEvent()">
+
+<div class="container">
+
+    <img src="img/bg1.jpg" style="width:360px;"/>
+<img id="myPlane" src="img/hero1 .png" style="width:40px;bottom:10px;left:160px;"/>
+    </div>
+</body>
+</html>
