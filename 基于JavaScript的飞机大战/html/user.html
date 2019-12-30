@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>奥凯航空-用户管理</title>
+    <link rel="stylesheet" href="../CSS/resit.css">
+    <link rel="stylesheet" href="../layui/css/layui.css">
+    <script src="../layui/layui.js"></script>
+</head>
+<body>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">用户管理</div>
+        <div class="layui-card-body">
+            <div class="layui-row layui-col-space10">
+                <div class="layui-col-xs10">
+
+                    <div class="layui-form layui-form-pane">
+                        <div class="layui-row layui-col-space10">
+
+                            <div class="layui-col-xs5">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">用户角色</label>
+                                    <div class="layui-input-block">
+                                        <select name="roleId" id="cmb_Role">
+                                            <option value="">请选择...</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="layui-col-xs5">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">用户名</label>
+                                    <div class="layui-input-block">
+                                        <input type="text"class="layui-input"name="userName" id="txt_userName" autocomplete="off" placeholder="请输入用户名">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-xs1">
+                                <button class="layui-btn layui-btn-normal layui-btn-fluid" id="btn_Query">
+                                    <i class="layui-icon layui-icon-search">查询</i>
+                                </button>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <!--                放置添加按钮-->
+                <div class="layui-col-xs1 layui-col-xs-offset10">
+                    <button class="layui-btn layui-btn-fluid" id="btn_add">
+                        <i class="layui-icon layui-icon-add-1"></i>
+                        添加
+                    </button>
+                </div>
+                <div class="layui-col-xs12">
+                    <table id="data_User" lay-filter="user"></table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['table','jquery','layer','form'],function () {
+        //初始化动态js组件，为了调用其中的方法
+        var form=layui.form;
+        var table=layui.table;
+        $=layui.$;
+        layer=parent===self?layui.layer:top.layui.layer;
+
+        table.render({
+            elem:'#data_User',//需要动态渲染的DOM元素
+                    url:"http://140.143.186.38:8088/api/User",//获取数据的连接
+                    page:true,
+                    cols:[[
+                        {field:'userId',title:'编号',width:'8%',align:'center'},
+                          {field:'nickName',title:'昵称',width:'10%',align:'center'},
+                          {field:'loginName',title:"登录名",width:'7%',align:'center'},
+                          {field:'trueName',title:"真实姓名",width:'8%',align:'center'},
+                        {title:"性别",width:'7%',align:'center', templet:function (data) {
+                                var gender=data.gender;
+                                var htmlStr='';
+                                switch(gender) {
+                                    case 1:
+                                        htmlStr = '<div style="color:cornflowerblue "><i class="layui-icon layui-icon-male"></i>男</div>'
+                                        break;
+                                    case 2:
+                                        htmlStr = '<div style="color:deeppink "><i class="layui-icon layui-icon-female"></i>女</div>'
+                                        break;
+                                }
+                                return htmlStr;
+                            }},
+                        {field:'age',title:"年龄",width:'5%',align:'center',sort:true},
+                        {filed:"isActive",title:'状态',width:'5%',align:"center",templet:function (data) {
+                                var staus=data.isActive;
+                                if(staus){
+                                    return '正常'
+                                }else{
+                                    return "禁用"
+                                }
+                            }},
+                        {field:'registerTime',title:"注册时间",width:'20%',align:'center'},
+                        {field:'roleName',title:"角色名称",width:'10%',align:'center'},
+                        {title:'操作',toolbar:'#tpl_Operate', align:'center'}//最后一行不需要指定宽度，自动填充剩余的
+            ]]
+        });
+        //初始化角色数据
+        $.get('http://140.143.186.38:8088/api/UserRole',function (res) {
+           //var $role=$('#cmb_Role');
+            for(i=0;i<res.length;i++){
+                var option = '<option value="'+ res[i].value + '">' + res[i].text + '</option>';
+                $('#cmb_Role').append(option);
+            }
+            form.render('select');
+        })
+        //用户查询按钮
+            $('#btn_Query').click(function () {
+                //重载表格
+                table.reload('data_User',{
+                    where:{
+                        roleId:$('#cmb_Role').val(),
+                        userName: $('#txt_userName').val()
+                    }
+                })
+            })
+
+
+        //工具栏的点击事件
+        table.on('tool(user)',function (object) {
+            var event = object.event;
+            var data = object.data;
+            //确定是否点击删除按钮
+            if (event === 'delete') {
+                layer.confirm('确定要输出这个用户吗？',
+                    {
+                        title: '信息信息',
+                        icon: 3
+                    },
+                    function (layerIndex) {
+                        //layuerIndex是弹出层的索引，关闭弹窗时候用的到
+                        layer.close(layerIndex);
+                        $.ajax({
+                            url:'http://140.143.186.38:8088/api/User/'+data.userId,
+                            type:'DELETE',
+                            success:function (res) {
+                                if (res.code === 0) {
+                                    layer.alert(res.data, {
+                                        icon: 1,
+                                        title: '信息提示'
+                                    },function (alertIndex) {
+                                        layer.close(alertIndex);
+                                        refreshTable();
+                                    })
+                                } else {
+                                    layer.alert(res.msg, {
+                                        icon: 2,
+                                        title: '错误提示'
+                                    })
+                                }
+                            }
+                        })
+                    })
+            }
+            //查看角色
+            if(event==='view'){
+                // layer.open()直接弹出页面
+                layer.open({
+                    type:2,//弹出框为iframe
+                    content:"user_view.html?userId="+data.userId,
+                    area:['960px','640px'],
+                    title:'用户详细信息查看'
+                })
+            }
+            //编辑学员
+            if(event==='update'){
+                layer.open({
+                    type:2,//弹出框为iframe
+                    content:"user_up.html?userId="+data.userId,
+                    area:['960px','640px'],
+                    title:"用户信息编辑"
+                })
+            }
+        })
+        //添加角色
+        $('#btn_add').click(function () {
+            layer.open({
+                type:2,//弹出框为iframe
+                content:"user_add.html",
+                area:['960px','640px'],
+                title:'角色添加',
+                //弹窗关闭销毁时调用
+                end:function () {
+                    refreshTable();
+                }
+            })
+        })
+    })
+
+</script>
+<script type="text/html" id="tpl_Operate">
+    <div class="layui-btn-group">
+        <button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="view">
+            <i class="layui-icon layui-icon-camera"></i>查看
+        </button>
+        <button class="layui-btn layui-btn-xs layui-btn-warm" lay-event="update">
+            <i class="layui-icon layui-icon-edit"></i>编辑
+        </button>
+        <button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">
+            <i class="layui-icon layui-icon-delete"></i>删除
+        </button>
+    </div>
+</script>
+</body>
+</html>

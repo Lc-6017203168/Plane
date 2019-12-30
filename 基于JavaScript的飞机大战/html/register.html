@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>j角色添加</title>
+    <link rel="stylesheet" href="../layui/css/layui.css">
+    <script src="../layui/layui.js"></script>
+    <link rel="stylesheet" href="../CSS/login.css">
+    <link rel="stylesheet" href="../CSS/resit.css">
+
+</head>
+<body>
+<<div id="LAY-user-login" class="layadmin-user-login-main layadmin-user-login layadmin-user-display-show">
+    <div class="layadmin-user-login-box layadmin-user-login-header">
+                    <div class="layui-col-xs12">
+                        <div class="layui-form-item">
+                            <lable class="layui-form-label" for="txt_roleId">
+                                <span class="required">*</span>
+                               用户名</lable>
+                            <div class="layui-input-block">
+                                <input type="text" placeholder="请输入用户名" class="layui-input" name="roleId" id="txt_roleId" lay-verify="required|number" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="layui-col-xs12">
+                        <div class="layui-form-item">
+                            <lable class="layui-form-label" for="">
+                                <span class="required">*</span>
+                                密码</lable>
+                            <div class="layui-input-block">
+                                <input type="text" placeholder="请输入密码" class="layui-input" name="password" id="password" lay-verify="required|number">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="layui-col-xs8 layui-col-xs-offset4">
+                        <div class="layui-form-item">
+                        <button type="button" class="layui-btn layui-btn-normal layui-btn-fluid" id="btn_Return" >
+                            <a href="register_ok.html">快速注册</a>
+                        </button>
+                        </div>
+                    </div>
+
+                    <div class="layui-col-xs8 layui-col-xs-offset4">
+                        <div class="layui-form-item">
+                        <button type="button" class="layui-btn layui-btn-fluid"  lay-submit lay-filter="role" >
+                            <a href="login.html">放回</a>
+                        </button>
+                        </div>
+                    </div>
+
+                </div>
+</div>
+
+
+</body>
+</html>

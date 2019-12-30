@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../layui/css/layui.css">
+    <script src="../layui/layui.js"></script>
+</head>
+<body>
+<div class="layui-fluid">
+    <!--    layui卡片-->
+    <div class="layui-card">
+        <div class="layui-card-header">角色管理列表</div>
+        <div class="layui-card-body">
+            <!--结构格栅化布局完成页面布局-->
+            <div class="layui-row layui-col-space10">
+
+                <!--                放置添加按钮-->
+                <div class="layui-col-xs1 layui-col-xs-offset10">
+                    <button class="layui-btn layui-btn-fluid" id="btn_add">
+                        <i class="layui-icon layui-icon-add-1"></i>
+                        添加
+                    </button>
+                </div>
+                <div class="layui-col-xs12">
+                    <!--                    lay-filter属性是为了识别-->
+                    <table id="data_Role" lay-filter="role"></table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['table','jquery','layer'],function () {
+        //初始化动态js组件，为了调用其中的方法
+        var table=layui.table;
+        $=layui.$;
+        layer=parent===self?layui.layer:top.layui.layer;
+
+        table.render({
+            elem:'#data_Role',//需要动态渲染的DOM元素
+            url:"http://140.143.186.38:8088/api/Role",//获取数据的连接
+            page:true,
+            cols:[[
+                {
+                    field:'roleId',//绑定需要显示的字段
+                    title:'编号',//表示显示的标题
+                    width:'10%',//宽度（px，%）
+                    align:'center'//对其方式
+                },
+                {field:'roleName',title:'管理员',width:'10%',align:'center'},
+                {field:'code',title:"码",width:'7%',align:'center'},
+                {field:'description',title:"个人简介",width:'15%'},
+                {title:'操作',toolbar:'#tpl_Operate', align:'center'}//最后一行不需要指定宽度，自动填充剩余的
+            ]]
+        });
+        //工具栏的点击事件
+        table.on('tool(role)',function (object) {
+            var event = object.event;
+            var data = object.data;
+            //确定是否点击删除按钮
+            if (event === 'delete') {
+                layer.confirm('确定要输出这个角色吗？',
+                    {
+                        title: '信息信息',
+                        icon: 3
+                    },
+                    function (layerIndex) {
+                        //layuerIndex是弹出层的索引，关闭弹窗时候用的到
+                        layer.close(layerIndex);
+                        $.ajax({
+                            url:'http://140.143.186.38:8088/api/Role/'+data.roleId,
+                            type:'DELETE',
+                            success:function (res) {
+                                if (res.code === 0) {
+                                    layer.alert(res.data, {
+                                        icon: 1,
+                                        title: '信息提示'
+                                    },function (alertIndex) {
+                                        layer.close(alertIndex);
+                                        refreshTable();
+                                    })
+                                } else {
+                                    layer.alert(res.msg, {
+                                        icon: 2,
+                                        title: '错误提示'
+                                    })
+                                }
+                            }
+                        })
+                    })
+            }
+            //查看角色
+            if(event==='view'){
+                // layer.open()直接弹出页面
+                layer.open({
+                    type:2,//弹出框为iframe
+                    content:"role_up.html?roleId="+data.roleId,
+                    area:['960px','640px'],
+                    title:'角色详细信息查看'
+                })
+            }
+            //编辑学员
+            if(event==='update'){
+                layer.open({
+                    type:2,//弹出框为iframe
+                    content:"role_up.html?roleId="+data.roleId,
+                    area:['960px','640px'],
+                    title:"角色信息编辑"
+                })
+            }
+        })
+        //添加角色
+        $('#btn_add').click(function () {
+            layer.open({
+                type:2,//弹出框为iframe
+                content:"role_ad.html",
+                area:['960px','640px'],
+                title:'角色添加',
+                //弹窗关闭销毁时调用
+                end:function () {
+                    refreshTable();
+                }
+            })
+        })
+    })
+
+</script>
+//按键群
+<script type="text/html" id="tpl_Operate">
+    <div class="layui-btn-group">
+        <button class="layui-btn layui-btn-xs layui-btn-primary" lay-event="view">
+            <i class="layui-icon layui-icon-camera"></i>查看
+        </button>
+        <button class="layui-btn layui-btn-xs layui-btn-warm" lay-event="update">
+            <i class="layui-icon layui-icon-edit"></i>编辑
+        </button>
+        <button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">
+            <i class="layui-icon layui-icon-delete"></i>删除
+        </button>
+    </div>
+</script>
+</body>
+</html>

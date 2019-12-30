@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>奥凯航空--登录页面</title>
+    <link rel="stylesheet" href="../layui/css/layui.css">
+    <script src="../layui/layui.js"></script>
+    <link rel="stylesheet" href="../CSS/login.css">
+    <link rel="stylesheet" href="../CSS/resit.css">
+</head>
+<body>
+
+<div id="LAY-user-login" class="layadmin-user-login-main layadmin-user-login layadmin-user-display-show">
+    <div class="layui-layer-shade" id="layui-layer-shade9" times="9" style="z-index: 19891022; background-color: rgb(0, 0, 0); opacity: 0.8;">
+        <div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+
+            <div class="layui-layer layui-layer-page "  times="7" showtime="0" contype="string" style="width: 300px;left: 40%" >
+                <div class="layui-layer-content" align="center">
+                    <div style="padding: 50px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;">
+                        欢迎登陆
+                        <br>系统以为你自动检测<br>
+                        <br>当前系统登陆用户<br>
+                        <img src="../img/1.png" height="160px" width="160px"/>
+                        <br>软件开发一班第四组测试账号<br>
+                        <br>
+                        <h2>是否登陆</h2>
+                    </div>
+                </div>
+                <span class="layui-layer-setwin"></span>
+                <div class="layui-layer-btn layui-layer-btn-c">
+
+                    <a class="layui-layer-btn0" href="../index.html" target="_blank">
+                        快速登陆</a>
+                    <a class="layui-layer-btn1" href="Login.html">残忍拒绝</a>
+                </div>
+                <span class="layui-layer-resize"></span>
+            </div>
+
+        </div>
+    </div>
+    <div class="layui-trans layadmin-user-login-footer">
+
+        <p>©2019 天津大学仁爱学院</p>
+        <p>
+            web前段实训训练
+        </p>
+    </div>
+
+
+</div>
+
+<script>
+    layui.use(['form','jquery','layer'],function () {
+        var form=layui.form;
+        layer=layui.layer,
+            $=layui.$;
+
+        form.on('submit(login)',function (object) {
+            var data=object.field;
+            $.post('http://140.143.186.38:8088/api/Account',
+                data,
+                function(res){
+                    if(res.code!==0){
+                        layer.alert(res.msg,{
+                            icon:2,
+                            title:'错误提示'
+                        })
+                    }else{
+                        window.location.href="main.html"
+                    }
+                })
+        })
+    })
+
+
+</script>
+
+</body>
+</html>
+
